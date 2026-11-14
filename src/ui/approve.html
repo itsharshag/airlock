@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Airlock: approve?</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+body { margin:0; background:#0b0d10; color:#e6edf3; font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; padding:22px; }
+.k { color:#8b96a3; font-size:12px; text-transform:uppercase; letter-spacing:.6px; margin-top:16px; }
+h1 { font-size:18px; margin:0 0 4px; } .who { font-size:20px; font-weight:700; word-break:break-all; }
+.badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; background:#2e2410; color:#d29922; letter-spacing:.4px; }
+ul { margin:6px 0; padding-left:18px; } li { margin:3px 0; }
+.warn li { color:#e3c57a; }
+.row { display:flex; gap:10px; margin-top:22px; }
+button { flex:1; height:42px; border-radius:9px; border:1px solid #2a323c; background:#1a2028; color:#e6edf3; font:600 14px inherit; cursor:pointer; font-family:inherit; }
+#yes { background:#1f6feb; border-color:#1f6feb; }
+.note { color:#8b96a3; font-size:12px; margin-top:12px; }
+#auto { color:#58a6ff; font-size:12px; margin-top:8px; min-height:16px; }
+</style></head>
+<body>
+<span class="badge">ONLY YOU CAN APPROVE</span>
+<h1 style="margin-top:10px">Approve this transaction?</h1>
+<div class="k">To</div><div class="who" id="to"></div>
+<div class="k">It will</div><ul id="what"></ul>
+<div class="k">Checks</div><ul id="why" class="warn"></ul>
+<div class="k">Requested by</div><div id="from"></div>
+<div class="row"><button id="no">Decline</button><button id="yes">Approve</button></div>
+<div class="note">This window is outside the page and outside the agent's control API.</div>
+<div id="auto"></div>
+<script>
+const id = location.hash.slice(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+approval.get(id).then(r => {
+  if (!r) return;
+  document.getElementById('to').textContent = r.tx.receiverId;
+  document.getElementById('what').innerHTML = r.summary.map(s => `<li>${esc(s)}</li>`).join('');
+  document.getElementById('why').innerHTML = r.reasons.filter(x => x.level !== 'block').map(x => `<li>${esc(x.text)}</li>`).join('');
+  document.getElementById('from').textContent = `${r.actor === 'agent' ? 'AI agent' : 'Page'} on ${r.origin}`;
+  const [act, ms] = (r.autodecide || '').split(':');
+  if (act) {
+    let left = Math.round(Number(ms) / 1000);
+    const tick = () => { document.getElementById('auto').textContent = `Demo recording: the human ${act === 'approve' ? 'approves' : 'declines'} in ${left}s`; if (left-- <= 0) approval.decide(id, act === 'approve'); else setTimeout(tick, 1000); };
+    tick();
+  }
+});
+document.getElementById('yes').onclick = e => e.isTrusted && approval.decide(id, true);
+document.getElementById('no').onclick = () => approval.decide(id, false);
+</script>
+</body></html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Airlock</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+<style>
+:root { --bg:#0b0d10; --panel:#11151a; --line:#1f262e; --text:#e6edf3; --dim:#8b96a3; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --accent:#58a6ff; }
+* { box-sizing:border-box; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; overflow:hidden; }
+.bar { height:52px; display:flex; align-items:center; gap:8px; padding:0 12px; border-bottom:1px solid var(--line); width:calc(100% - 380px); }
+.logo { font-weight:700; letter-spacing:.3px; display:flex; align-items:center; gap:7px; margin-right:6px; }
+.logo i { width:18px; height:18px; border-radius:5px; background:linear-gradient(135deg,#58a6ff,#3fb950); display:inline-block; }
+button { background:#1a2028; color:var(--text); border:1px solid var(--line); border-radius:7px; height:30px; padding:0 10px; cursor:pointer; font:inherit; }
+button:hover { border-color:#3a4552; }
+#url { flex:1; height:32px; background:#0f1318; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:0 12px; font:inherit; }
+.chip { height:26px; display:inline-flex; align-items:center; gap:6px; padding:0 9px; border-radius:20px; font-size:12px; border:1px solid var(--line); color:var(--dim); white-space:nowrap; }
+.chip.ok { color:var(--ok); border-color:#23472c; background:#0f2416; }
+.chip.bad { color:#fff; border-color:var(--bad); background:#5a1a17; }
+.chip.agent { color:#cbe2ff; border-color:#1f4a7a; background:#0e2238; }
+.side { position:fixed; top:0; right:0; width:380px; height:100%; background:var(--panel); border-left:1px solid var(--line); display:flex; flex-direction:column; }
+.side h2 { margin:0; font-size:13px; font-weight:600; padding:16px 16px 4px; }
+.meta { padding:0 16px 12px; color:var(--dim); font-size:12px; border-bottom:1px solid var(--line); }
+.meta b { color:var(--text); font-weight:500; }
+#log { flex:1; overflow:auto; padding:10px 12px 16px; display:flex; flex-direction:column; gap:8px; }
+.card { border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#0d1116; animation:in .25s ease; }
+@keyframes in { from { opacity:0; transform:translateY(-4px);} to { opacity:1; transform:none; } }
+.card .h { display:flex; align-items:center; gap:8px; font-weight:600; }
+.card .t { margin-left:auto; color:var(--dim); font-weight:400; font-size:11px; }
+.tag { font-size:11px; font-weight:700; padding:1px 7px; border-radius:5px; letter-spacing:.4px; }
+.allow .tag { background:#0f2416; color:var(--ok); } .warn .tag { background:#2e2410; color:var(--warn); } .block .tag { background:#3a1513; color:var(--bad); }
+.allow { border-color:#23472c; } .warn { border-color:#5a4513; } .block { border-color:#6b2420; }
+.card ul { margin:6px 0 0; padding-left:16px; color:#c3ccd5; } .card li { margin:2px 0; }
+.card .s { color:var(--dim); margin-top:4px; word-break:break-all; }
+.card a { color:var(--accent); }
+.agentc { border-color:#1f4a7a; } .agentc .tag { background:#0e2238; color:#79b8ff; } .agentc .h { font-weight:500; }
+.empty { color:var(--dim); padding:8px 4px; }
+#cap { display:none; margin:12px 12px 0; padding:12px 14px; border-radius:10px; background:#e6edf3; color:#0b0d10; font-weight:650; font-size:15px; line-height:1.35; }
+#cap.on { display:block; animation:in .25s ease; }
+.x { color:var(--dim); padding:8px 4px; }
+</style></head>
+<body>
+<div class="bar">
+  <span class="logo"><i></i>Airlock</span>
+  <button id="back" title="Back">‹</button>
+  <button id="reload" title="Reload">↻</button>
+  <input id="url" spellcheck="false" placeholder="Address">
+  <span id="pinchip" class="chip">Not pinned</span>
+  <button id="pin">Pin site</button>
+  <span id="agent" class="chip">Human</span>
+</div>
+<div class="side">
+  <h2>Shield</h2>
+  <div class="meta">
+    <div>Account <b id="acct">none</b> · <span id="net"></span></div>
+    <div>Agent key <b id="scope"></b></div>
+  </div>
+  <div id="cap"></div>
+  <div id="log"><div class="empty">Signing requests and frontend checks show here.</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const url = $('url');
+url.addEventListener('keydown', e => { if (e.key === 'Enter') airlock.navigate(url.value.trim()); });
+$('back').onclick = () => airlock.back();
+$('reload').onclick = () => airlock.reload();
+$('pin').onclick = () => airlock.pin();
+let editing = false; url.onfocus = () => editing = true; url.onblur = () => editing = false;
+airlock.onState(s => {
+  if (!editing) url.value = s.url === 'about:blank' ? '' : s.url;
+  const c = $('pinchip');
+  if (s.tampered) { c.className = 'chip bad'; c.textContent = 'Code changed: ' + s.tampered.path; }
+  else if (s.pinned) { c.className = 'chip ok'; c.textContent = 'Pinned · ' + s.pinnedFiles + ' files intact'; }
+  else { c.className = 'chip'; c.textContent = 'Not pinned'; }
+  $('pin').textContent = s.pinned ? 'Unpin' : 'Pin site';
+  const a = $('agent'); a.className = s.agentActive ? 'chip agent' : 'chip'; a.textContent = s.agentActive ? 'Agent driving' : 'Human';
+  $('acct').textContent = s.account || 'none'; $('net').textContent = s.network; $('scope').textContent = s.agentScope;
+});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const time = t => new Date(t).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+function card(cls, tag, title, body, t) {
+  const log = $('log'); log.querySelector('.empty')?.remove();
+  const d = document.createElement('div'); d.className = 'card ' + cls;
+  d.innerHTML = `<div class="h"><span class="tag">${tag}</span>${esc(title)}<span class="t">${time(t)}</span></div>${body}`;
+  log.prepend(d);
+}
+airlock.onCaption?.(t => { const c = $('cap'); c.textContent = t; c.className = t ? 'on' : ''; });
+airlock.onEvent(ev => {
+  if (ev.type === 'verdict') {
+    const tag = { allow:'ALLOW', warn:'ASK HUMAN', block:'BLOCKED' }[ev.verdict];
+    const rs = ev.reasons.filter(r => r.level !== 'info' || ev.verdict === 'allow');
+    card(ev.verdict, tag, `${ev.actor === 'agent' ? 'Agent' : 'Page'} wants to pay ${ev.tx.receiverId}`,
+      `<ul>${ev.summary.map(s => `<li>${esc(s)}</li>`).join('')}${rs.map(r => `<li>${esc(r.text)}</li>`).join('')}</ul><div class="s">from ${esc(ev.origin)}</div>`, ev.at);
+  } else if (ev.type === 'frontend-blocked') {
+    card('block', 'BLOCKED', 'Swapped frontend refused', `<ul><li>${esc(ev.path)} on ${esc(ev.origin)} ${ev.reason === 'new-file' ? 'was never part of the pinned site' : 'changed since it was pinned'}</li><li>The page never ran it</li></ul><div class="s">expected ${esc(ev.expected || 'none')}<br>got ${esc(ev.got)}</div>`, ev.at);
+  } else if (ev.type === 'pinned') {
+    card('allow', 'PINNED', ev.origin, `<ul>${ev.files.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`, ev.at);
+  } else if (ev.type === 'signed') {
+    card('allow', 'SIGNED', 'Sent on NEAR ' , `<div class="s">by ${esc(ev.by)}<br><a href="#" data-u="${esc(ev.explorer)}">${esc(ev.hash)}</a></div>`, ev.at);
+  } else if (ev.type === 'human') {
+    card(ev.approved ? 'allow' : 'block', ev.approved ? 'APPROVED' : 'DECLINED', `You ${ev.approved ? 'approved' : 'declined'} ${ev.receiverId}`, '', ev.at);
+  } else if (ev.type === 'agent-denied') {
+    card('block', 'DENIED', 'Agent tried to reach outside the page', `<div class="s">${esc(ev.route)}</div>`, ev.at);
+  } else if (ev.type === 'agent') {
+    card('agentc', 'AGENT', ev.route.slice(1), `<div class="s">${esc(ev.detail)}</div>`, ev.at);
+  } else if (ev.type === 'chain-error') {
+    card('block', 'CHAIN', 'NEAR rejected the transaction', `<div class="s">${esc(ev.message)}</div>`, ev.at);
+  }
+});
+document.addEventListener('click', e => { const u = e.target.dataset?.u; if (u) { e.preventDefault(); airlock.navigate(u); } });
+</script>
+</body></html>

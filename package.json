@@ -1,0 +1,17 @@
+{
+  "name": "airlock",
+  "version": "0.1.0",
+  "description": "A browser for AI agents that spend money on NEAR: pinned frontends, guarded signing, and an approve button the agent cannot reach.",
+  "main": "src/main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/",
+    "demo:site": "node demo/server.js",
+    "demo:agent": "node demo/agent.js"
+  },
+  "dependencies": {
+    "electron": "^33.4.11",
+    "near-api-js": "^5.1.1"
+  }
+}
