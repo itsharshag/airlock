@@ -2,8 +2,6 @@
 
 <img src="https://airlock.itsharshag.com/media/banner.jpg" alt="Airlock, a browser for AI agents that spend money on NEAR" width="880">
 
-**A browser for AI agents that spend money on NEAR.**
-
 The agent drives any page. Payments outside its key open a window only you can click.<br>A dapp whose code changed never loads.
 
 <p>
@@ -69,7 +67,7 @@ Four real runs, recorded from Airlock on NEAR testnet. A scripted agent drives t
 </tr>
 <tr>
 <td valign="top">
-<img src="https://airlock.itsharshag.com/media/self-approve.jpg" alt="The agent tries to approve its own payment">
+<img src="https://airlock.itsharshag.com/media/self-approve.jpg?v=2" alt="The agent tries to approve its own payment">
 <p><b>3. Ask you.</b> The agent tips 0.1 NEAR, which moves funds. Airlock opens its own approval window. The agent calls <code>/windows</code>, <code>/approve</code> and presses Enter, and none of it reaches the window.</p>
 </td>
 <td valign="top">
