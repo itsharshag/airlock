@@ -2,7 +2,7 @@
 <html><head><meta charset="utf-8"><title>Airlock: approve?</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
 <style>
-body { margin:0; background:#0b0d10; color:#e6edf3; font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; padding:22px; }
+body { margin:0; background:#1b1e23; border:1px solid #3a3f48; border-radius:14px; height:100vh; box-sizing:border-box; overflow:hidden; color:#e6edf3; font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; padding:22px; }
 .k { color:#8b96a3; font-size:12px; text-transform:uppercase; letter-spacing:.6px; margin-top:16px; }
 h1 { font-size:18px; margin:0 0 4px; } .who { font-size:20px; font-weight:700; word-break:break-all; }
 .badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; background:#2e2410; color:#d29922; letter-spacing:.4px; }
@@ -22,7 +22,7 @@ button { flex:1; height:42px; border-radius:9px; border:1px solid #2a323c; backg
 <div class="k">Checks</div><ul id="why" class="warn"></ul>
 <div class="k">Requested by</div><div id="from"></div>
 <div class="row"><button id="no">Decline</button><button id="yes">Approve</button></div>
-<div class="note">This window is outside the page and outside the agent's control API.</div>
+<div class="note">Airlock draws this window itself. The page and the agent cannot see or click it.</div>
 <div id="auto"></div>
 <script>
 const id = location.hash.slice(1);
@@ -36,7 +36,7 @@ approval.get(id).then(r => {
   const [act, ms] = (r.autodecide || '').split(':');
   if (act) {
     let left = Math.round(Number(ms) / 1000);
-    const tick = () => { document.getElementById('auto').textContent = `Demo recording: the human ${act === 'approve' ? 'approves' : 'declines'} in ${left}s`; if (left-- <= 0) approval.decide(id, act === 'approve'); else setTimeout(tick, 1000); };
+    const tick = () => { document.getElementById('auto').textContent = `In this recording a script plays you and ${act === 'approve' ? 'approves' : 'declines'} in ${left}s`; if (left-- <= 0) approval.decide(id, act === 'approve'); else setTimeout(tick, 1000); };
     tick();
   }
 });

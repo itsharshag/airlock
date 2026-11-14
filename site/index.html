@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Airlock</title>
-<meta name="description" content="A browser for AI agents that spend money on NEAR. The agent drives the page. Only you approve payments. Swapped frontends never load.">
+<meta name="description" content="A browser for AI agents that spend money on NEAR.">
 <meta property="og:title" content="Airlock"><meta property="og:description" content="A browser for AI agents that spend money on NEAR.">
 <meta property="og:image" content="https://airlock.itsharshag.com/poster.jpg">
 <style>
@@ -38,45 +38,45 @@ footer { margin-top:60px; color:var(--dim); font-size:13px; }
 <body><div class="wrap">
 <div class="logo"><i></i>Airlock</div>
 <h1>A browser for AI agents that spend money on NEAR</h1>
-<p class="sub">The agent drives the page. Only you approve payments. Swapped frontends never load.</p>
+<p class="sub">Airlock lets an agent drive any page. Payments outside the agent's key go to a window only you can click, and a dapp whose code changed does not load.</p>
 <div class="cta">
   <a class="p" href="https://github.com/itsharshag/airlock">GitHub</a>
   <a href="#try">Try it</a>
   <a href="https://airlock-tipjar.itsharshag.com">Demo dapp</a>
-  <a href="https://airlock-news.itsharshag.com">Injected page</a>
+  <a href="https://airlock-news.itsharshag.com">Page with a hidden prompt</a>
 </div>
 <video src="demo.mp4" poster="poster.jpg" controls playsinline muted preload="metadata"></video>
 
-<h2>What an extension can't do</h2>
+<h2>The attacks it stops</h2>
 <div class="grid">
-  <div class="card"><h3>Check code before it runs</h3><p>Every file from a pinned dapp is hashed in the network layer. A changed file is refused. Extensions never see response bodies.</p><div class="ex">Bybit, Feb 2025: swapped Safe{Wallet} JavaScript, $1.5B</div></div>
-  <div class="card"><h3>Keep approval out of the agent's reach</h3><p>The agent's control API reaches the page only. Approvals open in a separate window, with Touch ID on macOS. Remote debugging is refused.</p><div class="ex">May 2026: hidden text in a page drained $175k from an agent's wallet</div></div>
-  <div class="card"><h3>No extension supply chain</h3><p>The guard is the browser. There is no extension to hijack with a bad update.</p><div class="ex">Trust Wallet extension v2.68, Dec 2025, about $7M</div></div>
+  <div class="card"><h3>A swapped dapp frontend</h3><p>Airlock hashes every file a pinned dapp serves before the page gets it. If a file changes, Airlock refuses it and blocks signing from that site. Chrome extensions never see a site's files, so they cannot do this.</p><div class="ex">Bybit lost $1.5B in February 2025 after attackers swapped the Safe{Wallet} JavaScript.</div></div>
+  <div class="card"><h3>An agent tricked by a page</h3><p>The agent controls the browser through an API that reaches the page and nothing else. Approvals open in a separate window, and on macOS they also need Touch ID. Airlock refuses to start with remote debugging on.</p><div class="ex">In May 2026, hidden text in a page drained $175k from an AI agent's wallet.</div></div>
+  <div class="card"><h3>A poisoned extension update</h3><p>Airlock has no extensions. The signing guard is part of the browser.</p><div class="ex">A bad Trust Wallet extension update took about $7M in December 2025.</div></div>
 </div>
 
-<h2>Every signing request gets a verdict</h2>
+<h2>What happens when a page asks to sign</h2>
 <div class="flow">
-  <div class="v allow"><b>ALLOW</b><p>Inside the agent's NEAR function-call key: one contract, one method, no deposits. The agent key signs.</p></div>
-  <div class="v warn"><b>ASK HUMAN</b><p>Moves funds, new or barely used receiver, contract code changed this week. Only the approval window can sign.</p></div>
-  <div class="v block"><b>BLOCK</b><p>Lookalike account, shared blocklist, full access key, account deletion, or a page whose code failed its pin.</p></div>
+  <div class="v allow"><b>ALLOW</b><p>The request fits the agent's NEAR function-call key, which can call one method on one contract and cannot move NEAR. The agent key signs it.</p></div>
+  <div class="v warn"><b>ASK YOU</b><p>The request moves funds, or the receiver is new, barely used, or changed its contract this week. Only the approval window can sign it.</p></div>
+  <div class="v block"><b>BLOCK</b><p>The receiver imitates a known account or is on the blocklist, the request adds a full access key or deletes the account, or the site's code failed its pin.</p></div>
 </div>
 
-<h2>Recorded on testnet</h2>
-<div class="tx">
-  <p>Agent key signs the guestbook: <a href="https://testnet.nearblocks.io/txns/CZo971HZiHMQoSqoXF83ubnp2fQGnfrLUBPNmn7Pqpn1">CZo971HZ…</a></p>
-  <p>Human approves the 0.1 NEAR tip: <a href="https://testnet.nearblocks.io/txns/6zLiVrkNprYtsmYAFwyPgHpYPbGMRePFjAR7RPcUCrFL">6zLiVrkN…</a></p>
+<h2>Testnet transactions from the video</h2>
+<div class="tx" id="txs">
+  <p>The agent key signs the guestbook entry. <a href="https://testnet.nearblocks.io/txns/FE8mWrmjAufe2okyNtnuzUUbjKuq2YKC8rZpVaHZAwzL">FE8mWrmj…</a></p>
+  <p>You approve the 0.1 NEAR tip. <a href="https://testnet.nearblocks.io/txns/3pdd9Q3zdMVPMVpphHKyaQrtdCheGeM33Hm7sKwo5Jt3">3pdd9Q3z…</a></p>
 </div>
 
 <h2 id="try">Try it</h2>
 <pre><code>git clone https://github.com/itsharshag/airlock && cd airlock && npm install
-node scripts/make-account.js     # then create it with the faucet (README)
-node scripts/add-agent-key.js
+node scripts/make-account.js     # creates a testnet account from the faucet
+node scripts/add-agent-key.js    # adds the agent's function-call key on chain
 node scripts/make-payee.js
 
 T=https://airlock-tipjar.itsharshag.com
 AIRLOCK_START_URL=$T AIRLOCK_PINS=$T npm start
-# in Airlock: Sign the guestbook, Tip 0.1 NEAR, open https://airlock-news.itsharshag.com
-# then open $T/__attacker/swap?on=1 to swap app.js for you only</code></pre>
+# In Airlock, sign the guestbook, tip 0.1 NEAR, and open https://airlock-news.itsharshag.com
+# Open $T/__attacker/swap?on=1 to swap app.js in your browser only</code></pre>
 
-<footer>Built at NEAR Hackathon, November 2026. MIT.</footer>
+<footer>Built at NEAR Hackathon in November 2026. MIT license.</footer>
 </div></body></html>

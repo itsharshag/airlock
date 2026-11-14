@@ -2,58 +2,82 @@
 <html><head><meta charset="utf-8"><title>Airlock</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
 <style>
-:root { --bg:#0b0d10; --panel:#11151a; --line:#1f262e; --text:#e6edf3; --dim:#8b96a3; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --accent:#58a6ff; }
+:root { --frame:#16181c; --bar:#1e2126; --omni:#2a2e35; --line:#2c3038; --panel:#15171b; --card:#1c1f24; --text:#eceef2; --dim:#9aa1ac; --ok:#3ecf6e; --warn:#f0b43c; --bad:#ff5a52; --accent:#6aa8ff; }
 * { box-sizing:border-box; }
-html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; overflow:hidden; }
-.bar { height:52px; display:flex; align-items:center; gap:8px; padding:0 12px; border-bottom:1px solid var(--line); width:calc(100% - 380px); }
-.logo { font-weight:700; letter-spacing:.3px; display:flex; align-items:center; gap:7px; margin-right:6px; }
-.logo i { width:18px; height:18px; border-radius:5px; background:linear-gradient(135deg,#58a6ff,#3fb950); display:inline-block; }
-button { background:#1a2028; color:var(--text); border:1px solid var(--line); border-radius:7px; height:30px; padding:0 10px; cursor:pointer; font:inherit; }
-button:hover { border-color:#3a4552; }
-#url { flex:1; height:32px; background:#0f1318; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:0 12px; font:inherit; }
-.chip { height:26px; display:inline-flex; align-items:center; gap:6px; padding:0 9px; border-radius:20px; font-size:12px; border:1px solid var(--line); color:var(--dim); white-space:nowrap; }
-.chip.ok { color:var(--ok); border-color:#23472c; background:#0f2416; }
-.chip.bad { color:#fff; border-color:var(--bad); background:#5a1a17; }
-.chip.agent { color:#cbe2ff; border-color:#1f4a7a; background:#0e2238; }
-.side { position:fixed; top:0; right:0; width:380px; height:100%; background:var(--panel); border-left:1px solid var(--line); display:flex; flex-direction:column; }
-.side h2 { margin:0; font-size:13px; font-weight:600; padding:16px 16px 4px; }
-.meta { padding:0 16px 12px; color:var(--dim); font-size:12px; border-bottom:1px solid var(--line); }
-.meta b { color:var(--text); font-weight:500; }
-#log { flex:1; overflow:auto; padding:10px 12px 16px; display:flex; flex-direction:column; gap:8px; }
-.card { border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#0d1116; animation:in .25s ease; }
-@keyframes in { from { opacity:0; transform:translateY(-4px);} to { opacity:1; transform:none; } }
-.card .h { display:flex; align-items:center; gap:8px; font-weight:600; }
+html,body { margin:0; height:100%; background:var(--frame); color:var(--text); font:13px/1.45 Inter,"SF Pro Text",-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; -webkit-font-smoothing:antialiased; }
+.tabs { height:40px; display:flex; align-items:flex-end; gap:6px; padding:0 12px; -webkit-app-region:drag; }
+.lights { display:flex; gap:8px; align-self:center; margin-right:14px; }
+.lights i { width:12px; height:12px; border-radius:50%; display:block; }
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+.tab { height:32px; width:240px; background:var(--bar); border-radius:10px 10px 0 0; display:flex; align-items:center; gap:8px; padding:0 12px; font-size:12.5px; }
+.tab .fav { width:16px; height:16px; border-radius:4px; background:#3a3f48; flex:none; display:grid; place-items:center; font-size:10px; font-weight:700; color:#fff; }
+.tab .tt { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; flex:1; }
+.tab .x { color:var(--dim); }
+.newtab { color:var(--dim); font-size:18px; align-self:center; padding:0 6px; }
+.bar { height:48px; background:var(--bar); display:flex; align-items:center; gap:6px; padding:0 10px; border-bottom:1px solid #000; }
+.ib { width:32px; height:32px; border-radius:8px; display:grid; place-items:center; color:#c9ced6; border:0; background:none; cursor:pointer; }
+.ib svg { width:18px; height:18px; }
+.omni { flex:1; height:34px; background:var(--omni); border-radius:17px; display:flex; align-items:center; gap:8px; padding:0 14px; margin:0 6px; }
+.omni svg { width:14px; height:14px; color:#aeb4bd; flex:none; }
+#url { flex:1; background:none; border:0; outline:0; color:#d6dae0; font:inherit; font-size:13.5px; }
+.pinpill { height:24px; display:none; align-items:center; gap:6px; padding:0 10px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; }
+.pinpill.ok { display:flex; color:var(--ok); background:rgba(62,207,110,.12); }
+.pinpill.bad { display:flex; color:#fff; background:var(--bad); }
+.pinpill svg { width:13px; height:13px; }
+.shieldbtn { height:32px; display:flex; align-items:center; gap:7px; padding:0 12px 0 10px; border-radius:8px; background:#262a31; font-weight:600; font-size:12.5px; }
+.shieldbtn svg { width:16px; height:16px; color:var(--ok); }
+.who { height:28px; display:flex; align-items:center; gap:6px; padding:0 11px; border-radius:14px; font-size:12px; font-weight:600; color:var(--dim); background:#262a31; }
+.who.agent { color:#cfe2ff; background:#1d3557; }
+.who i { width:7px; height:7px; border-radius:50%; background:currentColor; display:block; }
+.side { position:fixed; top:88px; right:0; width:400px; bottom:0; background:var(--panel); border-left:1px solid #000; display:flex; flex-direction:column; }
+.sh { padding:16px 18px 12px; border-bottom:1px solid var(--line); }
+.sh h2 { margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:8px; }
+.sh h2 svg { width:16px; height:16px; color:var(--ok); }
+.meta { color:var(--dim); font-size:12px; } .meta b { color:var(--text); font-weight:500; }
+#cap { display:none; margin:12px 14px 0; padding:12px 14px; border-radius:10px; background:#eceef2; color:#111; font-weight:650; font-size:15px; }
+#cap.on { display:block; }
+#log { flex:1; overflow:hidden; padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+.card { border-radius:12px; padding:12px 14px; background:var(--card); border:1px solid var(--line); animation:in .3s cubic-bezier(.2,.8,.2,1); }
+@keyframes in { from { opacity:0; transform:translateY(-8px) scale(.98);} to { opacity:1; transform:none; } }
+.card .h { display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; }
 .card .t { margin-left:auto; color:var(--dim); font-weight:400; font-size:11px; }
-.tag { font-size:11px; font-weight:700; padding:1px 7px; border-radius:5px; letter-spacing:.4px; }
-.allow .tag { background:#0f2416; color:var(--ok); } .warn .tag { background:#2e2410; color:var(--warn); } .block .tag { background:#3a1513; color:var(--bad); }
-.allow { border-color:#23472c; } .warn { border-color:#5a4513; } .block { border-color:#6b2420; }
-.card ul { margin:6px 0 0; padding-left:16px; color:#c3ccd5; } .card li { margin:2px 0; }
-.card .s { color:var(--dim); margin-top:4px; word-break:break-all; }
-.card a { color:var(--accent); }
-.agentc { border-color:#1f4a7a; } .agentc .tag { background:#0e2238; color:#79b8ff; } .agentc .h { font-weight:500; }
-.empty { color:var(--dim); padding:8px 4px; }
-#cap { display:none; margin:12px 12px 0; padding:12px 14px; border-radius:10px; background:#e6edf3; color:#0b0d10; font-weight:650; font-size:15px; line-height:1.35; }
-#cap.on { display:block; animation:in .25s ease; }
-.x { color:var(--dim); padding:8px 4px; }
+.tag { font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:5px; letter-spacing:.5px; flex:none; }
+.card ul { margin:8px 0 0; padding-left:16px; color:#cdd2da; font-size:12.5px; } .card li { margin:3px 0; }
+.card .s { color:var(--dim); margin-top:6px; font-size:12px; word-break:break-all; }
+.card a { color:var(--accent); text-decoration:none; }
+.allow { border-color:rgba(62,207,110,.35); } .allow .tag { background:rgba(62,207,110,.15); color:var(--ok); }
+.warn { border-color:rgba(240,180,60,.4); } .warn .tag { background:rgba(240,180,60,.15); color:var(--warn); }
+.block { border-color:rgba(255,90,82,.45); } .block .tag { background:rgba(255,90,82,.16); color:var(--bad); }
+.agentc .tag { background:#1d3557; color:#9cc3ff; } .agentc .h { font-weight:500; }
+.empty { color:var(--dim); padding:8px 2px; }
 </style></head>
 <body>
+<div class="tabs">
+  <div class="lights"><i></i><i></i><i></i></div>
+  <div class="tab"><span class="fav" id="fav">A</span><span class="tt" id="title">New tab</span><span class="x">×</span></div>
+  <span class="newtab">+</span>
+</div>
 <div class="bar">
-  <span class="logo"><i></i>Airlock</span>
-  <button id="back" title="Back">‹</button>
-  <button id="reload" title="Reload">↻</button>
-  <input id="url" spellcheck="false" placeholder="Address">
-  <span id="pinchip" class="chip">Not pinned</span>
-  <button id="pin">Pin site</button>
-  <span id="agent" class="chip">Human</span>
+  <button class="ib" id="back" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button class="ib" title="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".45"><path d="M9 18l6-6-6-6"/></svg></button>
+  <button class="ib" id="reload" title="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
+  <div class="omni">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    <input id="url" spellcheck="false" placeholder="Search or enter address">
+    <span id="pinchip" class="pinpill"></span>
+  </div>
+  <button class="ib" id="pin" title="Pin this site's code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 17v5M5 17h14l-2-4V5H7v8z"/></svg></button>
+  <span class="who" id="agent"><i></i><span>You</span></span>
+  <span class="shieldbtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg>Shield</span>
 </div>
 <div class="side">
-  <h2>Shield</h2>
-  <div class="meta">
-    <div>Account <b id="acct">none</b> · <span id="net"></span></div>
-    <div>Agent key <b id="scope"></b></div>
+  <div class="sh">
+    <h2><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg>Shield</h2>
+    <div class="meta"><b id="acct">no account</b> on <span id="net"></span></div>
+    <div class="meta">Agent key can call <b id="scope"></b></div>
   </div>
   <div id="cap"></div>
-  <div id="log"><div class="empty">Signing requests and frontend checks show here.</div></div>
+  <div id="log"><div class="empty">Signing requests and code checks appear here.</div></div>
 </div>
 <script>
 const $ = id => document.getElementById(id);
@@ -63,43 +87,47 @@ $('back').onclick = () => airlock.back();
 $('reload').onclick = () => airlock.reload();
 $('pin').onclick = () => airlock.pin();
 let editing = false; url.onfocus = () => editing = true; url.onblur = () => editing = false;
+const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>';
 airlock.onState(s => {
-  if (!editing) url.value = s.url === 'about:blank' ? '' : s.url;
+  if (!editing) url.value = s.url === 'about:blank' ? '' : s.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   const c = $('pinchip');
-  if (s.tampered) { c.className = 'chip bad'; c.textContent = 'Code changed: ' + s.tampered.path; }
-  else if (s.pinned) { c.className = 'chip ok'; c.textContent = 'Pinned · ' + s.pinnedFiles + ' files intact'; }
-  else { c.className = 'chip'; c.textContent = 'Not pinned'; }
-  $('pin').textContent = s.pinned ? 'Unpin' : 'Pin site';
-  const a = $('agent'); a.className = s.agentActive ? 'chip agent' : 'chip'; a.textContent = s.agentActive ? 'Agent driving' : 'Human';
-  $('acct').textContent = s.account || 'none'; $('net').textContent = s.network; $('scope').textContent = s.agentScope;
+  if (s.tampered) { c.className = 'pinpill bad'; c.textContent = s.tampered.path + ' changed'; }
+  else if (s.pinned) { c.className = 'pinpill ok'; c.innerHTML = tick + 'Code pinned'; }
+  else { c.className = 'pinpill'; }
+  $('title').textContent = s.title || 'New tab';
+  try { $('fav').textContent = (new URL(s.url).hostname.replace(/^airlock-/, '')[0] || 'A').toUpperCase(); } catch {}
+  const a = $('agent'); a.className = s.agentActive ? 'who agent' : 'who'; a.lastChild.textContent = s.agentActive ? 'Agent driving' : 'You';
+  $('acct').textContent = s.account || 'no account'; $('net').textContent = s.network; $('scope').textContent = s.agentScope.replace(' · ', ' ');
 });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 const time = t => new Date(t).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+const host = o => o.replace(/^https?:\/\//, '');
 function card(cls, tag, title, body, t) {
   const log = $('log'); log.querySelector('.empty')?.remove();
   const d = document.createElement('div'); d.className = 'card ' + cls;
   d.innerHTML = `<div class="h"><span class="tag">${tag}</span>${esc(title)}<span class="t">${time(t)}</span></div>${body}`;
   log.prepend(d);
+  while (log.children.length > 9) log.lastChild.remove();
 }
 airlock.onCaption?.(t => { const c = $('cap'); c.textContent = t; c.className = t ? 'on' : ''; });
 airlock.onEvent(ev => {
   if (ev.type === 'verdict') {
-    const tag = { allow:'ALLOW', warn:'ASK HUMAN', block:'BLOCKED' }[ev.verdict];
-    const rs = ev.reasons.filter(r => r.level !== 'info' || ev.verdict === 'allow');
+    const tag = { allow:'ALLOW', warn:'ASK YOU', block:'BLOCKED' }[ev.verdict];
+    const rs = ev.reasons.filter(r => r.level !== 'info');
     card(ev.verdict, tag, `${ev.actor === 'agent' ? 'Agent' : 'Page'} wants to pay ${ev.tx.receiverId}`,
-      `<ul>${ev.summary.map(s => `<li>${esc(s)}</li>`).join('')}${rs.map(r => `<li>${esc(r.text)}</li>`).join('')}</ul><div class="s">from ${esc(ev.origin)}</div>`, ev.at);
+      `<ul>${ev.summary.map(s => `<li>${esc(s)}</li>`).join('')}${rs.map(r => `<li>${esc(r.text)}</li>`).join('')}</ul><div class="s">from ${esc(host(ev.origin))}</div>`, ev.at);
   } else if (ev.type === 'frontend-blocked') {
-    card('block', 'BLOCKED', 'Swapped frontend refused', `<ul><li>${esc(ev.path)} on ${esc(ev.origin)} ${ev.reason === 'new-file' ? 'was never part of the pinned site' : 'changed since it was pinned'}</li><li>The page never ran it</li></ul><div class="s">expected ${esc(ev.expected || 'none')}<br>got ${esc(ev.got)}</div>`, ev.at);
+    card('block', 'BLOCKED', 'Changed code refused', `<ul><li>${esc(ev.path)} on ${esc(host(ev.origin))} ${ev.reason === 'new-file' ? 'was not part of the pinned site' : 'does not match its pin'}</li><li>The page never ran it</li></ul>`, ev.at);
   } else if (ev.type === 'pinned') {
-    card('allow', 'PINNED', ev.origin, `<ul>${ev.files.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`, ev.at);
+    card('allow', 'PINNED', host(ev.origin), `<div class="s">${ev.files.map(esc).join('  ')}</div>`, ev.at);
   } else if (ev.type === 'signed') {
-    card('allow', 'SIGNED', 'Sent on NEAR ' , `<div class="s">by ${esc(ev.by)}<br><a href="#" data-u="${esc(ev.explorer)}">${esc(ev.hash)}</a></div>`, ev.at);
+    card('allow', 'SIGNED', ev.by.startsWith('agent') ? 'Agent key signed' : 'You approved and signed', `<div class="s"><a href="#" data-u="${esc(ev.explorer)}">${esc(ev.hash)}</a></div>`, ev.at);
   } else if (ev.type === 'human') {
-    card(ev.approved ? 'allow' : 'block', ev.approved ? 'APPROVED' : 'DECLINED', `You ${ev.approved ? 'approved' : 'declined'} ${ev.receiverId}`, '', ev.at);
+    if (!ev.approved) card('block', 'DECLINED', `You declined ${ev.receiverId}`, '', ev.at);
   } else if (ev.type === 'agent-denied') {
-    card('block', 'DENIED', 'Agent tried to reach outside the page', `<div class="s">${esc(ev.route)}</div>`, ev.at);
+    card('block', 'DENIED', 'Agent tried to approve its own payment', `<div class="s">${esc(ev.route)} does not exist for agents</div>`, ev.at);
   } else if (ev.type === 'agent') {
-    card('agentc', 'AGENT', ev.route.slice(1), `<div class="s">${esc(ev.detail)}</div>`, ev.at);
+    if (ev.route === '/open' || ev.route === '/click') card('agentc', 'AGENT', ev.route === '/open' ? 'Opens ' + host(ev.detail) : 'Clicks "' + ev.detail + '"', '', ev.at);
   } else if (ev.type === 'chain-error') {
     card('block', 'CHAIN', 'NEAR rejected the transaction', `<div class="s">${esc(ev.message)}</div>`, ev.at);
   }

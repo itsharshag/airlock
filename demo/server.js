@@ -23,7 +23,7 @@ http.createServer(serve('tipjar', (req, res, u) => {
     const on = /on=1/.test(req.url);
     res.writeHead(302, { 'set-cookie': `swapped=${on ? 1 : 0}; Path=/; SameSite=Lax`, location: '/' }); res.end(); return true;
   }
-  if (u === '/__attacker/swap') { swapped = req.method === 'POST'; console.log('[attacker] app.js swapped:', swapped); res.end(String(swapped)); return true; }
+  if (u === '/__attacker/swap' && !req.headers['x-forwarded-for']) { swapped = req.method === 'POST'; console.log('[attacker] app.js swapped:', swapped); res.end(String(swapped)); return true; }
 })).listen(Number(process.env.TIPJAR_PORT || 4001), '127.0.0.1');
 http.createServer(serve('news')).listen(Number(process.env.NEWS_PORT || 4002), '127.0.0.1');
 console.log('tipjar http://127.0.0.1:4001  news http://127.0.0.1:4002  payee', payee);

@@ -84,7 +84,7 @@ function askHuman(request) {
     const id = crypto.randomUUID();
     const pb = win.getBounds();
     const w = new BrowserWindow({
-      width: 520, height: 640, x: pb.x + Math.round((pb.width - 380 - 520) / 2), y: pb.y + 110, parent: win, modal: true, resizable: false, title: 'Airlock: approve?',
+      width: 540, height: 600, x: pb.x + Math.round((pb.width - 400 - 540) / 2), y: pb.y + 150, frame: false, parent: win, modal: true, resizable: false, title: 'Airlock: approve?',
       backgroundColor: '#0b0d10',
       webPreferences: { preload: path.join(__dirname, 'ui', 'approve-preload.js'), partition: 'airlock-approval', sandbox: true, contextIsolation: true },
     });
@@ -169,12 +169,14 @@ function sendState() {
 
 function layout() {
   const [w, h] = win.getContentSize();
-  page.setBounds({ x: 0, y: 52, width: w - 380, height: h - 52 });
+  page.setBounds({ x: 0, y: 88, width: w - 400, height: h - 88 });
 }
 
 function createWindow() {
+  const [W, H] = (process.env.AIRLOCK_SIZE || '1440x900').split('x').map(Number);
   win = new BrowserWindow({
-    width: 1440, height: 900, title: 'Airlock', backgroundColor: '#0b0d10',
+    width: W, height: H, x: 0, y: 0, title: 'Airlock', backgroundColor: '#16181c',
+    frame: process.platform === 'darwin', titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
     webPreferences: { preload: path.join(__dirname, 'ui', 'chrome-preload.js'), sandbox: true, contextIsolation: true },
   });
   win.loadFile(path.join(__dirname, 'ui', 'chrome.html'));
@@ -216,6 +218,8 @@ function startAgentApi() {
     'POST /key': async (b) => { wc().sendInputEvent({ type: 'keyDown', keyCode: b.key }); wc().sendInputEvent({ type: 'keyUp', keyCode: b.key }); return { sent: b.key, to: 'page' }; },
     // Demo recordings only: a caption banner in the Shield panel. Off unless AIRLOCK_DEMO_CAPTIONS=1.
     ...(process.env.AIRLOCK_DEMO_CAPTIONS === '1' ? { 'POST /caption': async (b) => { win.webContents.send('caption', b.text); return {}; } } : {}),
+    // Demo recordings only: plays the attacker by setting the demo server's swap cookie in this browser.
+    ...(process.env.AIRLOCK_DEMO === '1' ? { 'POST /demo/attacker-swap': async (b) => { await wc().session.cookies.set({ url: b.url, name: 'swapped', value: b.on ? '1' : '0' }); return {}; } } : {}),
     'GET /windows': async () => ({ windows: ['page'], note: 'Approval windows are not addressable from the agent API.' }),
   };
   http.createServer(async (req, res) => {
@@ -225,7 +229,7 @@ function startAgentApi() {
     const route = routes[`${req.method} ${req.url.split('?')[0]}`];
     lastAgentCall = Date.now();
     const b = body ? JSON.parse(body) : {};
-    if (route && req.method === 'POST' && !req.url.startsWith('/caption')) log('agent', { route: req.url, detail: b.url || b.text || b.selector || (b.js ? 'runs a script in the page' : b.key || '') });
+    if (route && req.method === 'POST' && !/^\/(caption|demo\/)/.test(req.url)) log('agent', { route: req.url, detail: b.url || b.text || b.selector || (b.js ? 'runs a script in the page' : b.key || '') });
     if (!route) { log('agent-denied', { route: `${req.method} ${req.url}` }); return send(404, { error: `No such endpoint. Approvals belong to the human.` }); }
     try { send(200, await route(b)); } catch (e) { send(500, { error: String(e.message || e) }); }
   }).listen(7777, '127.0.0.1');
