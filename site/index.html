@@ -3,80 +3,234 @@
 <title>Airlock</title>
 <meta name="description" content="A browser for AI agents that spend money on NEAR.">
 <meta property="og:title" content="Airlock"><meta property="og:description" content="A browser for AI agents that spend money on NEAR.">
-<meta property="og:image" content="https://airlock.itsharshag.com/poster.jpg">
+<meta property="og:image" content="https://airlock.itsharshag.com/poster.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236aa8ff'/%3E%3Cstop offset='1' stop-color='%233ecf6e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23g)'/%3E%3Cpath d='M12 5l5 2v4c0 3.2-2.2 6-5 7-2.8-1-5-3.8-5-7V7z' fill='%2307080a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#0b0d10; --panel:#11151a; --line:#1f262e; --text:#e6edf3; --dim:#8b96a3; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --accent:#58a6ff; }
+:root { --bg:#050608; --panel:rgba(255,255,255,.03); --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14); --text:#eef1f5; --dim:#8b93a0; --dim2:#5d6470; --ok:#3ecf6e; --warn:#f0b43c; --bad:#ff5a5f; --blue:#6aa8ff; }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif; }
-.wrap { max-width:1040px; margin:0 auto; padding:56px 20px 80px; }
-.logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; }
-.logo i { width:22px; height:22px; border-radius:6px; background:linear-gradient(135deg,#58a6ff,#3fb950); display:inline-block; }
-h1 { font-size:clamp(30px,5vw,48px); line-height:1.1; margin:28px 0 14px; letter-spacing:-.5px; max-width:820px; }
-.sub { color:var(--dim); font-size:18px; max-width:680px; margin:0; }
-.cta { display:flex; flex-wrap:wrap; gap:10px; margin:26px 0 34px; }
-.cta a { text-decoration:none; color:var(--text); border:1px solid var(--line); background:#151a20; padding:10px 16px; border-radius:9px; font-weight:600; font-size:14px; }
-.cta a.p { background:#1f6feb; border-color:#1f6feb; }
-video { width:100%; border-radius:12px; border:1px solid var(--line); background:#000; display:block; }
-h2 { font-size:22px; margin:56px 0 16px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
-.card { border:1px solid var(--line); background:var(--panel); border-radius:12px; padding:18px; }
-.card h3 { margin:0 0 8px; font-size:16px; }
-.card p { margin:0; color:#c3ccd5; font-size:14.5px; }
-.card .ex { margin-top:10px; color:var(--dim); font-size:13px; }
-.flow { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
-.v { border-radius:12px; padding:16px; border:1px solid; }
-.v b { display:inline-block; font-size:12px; letter-spacing:.5px; padding:2px 8px; border-radius:5px; margin-bottom:8px; }
-.allow { border-color:#23472c; } .allow b { background:#0f2416; color:var(--ok); }
-.warn { border-color:#5a4513; } .warn b { background:#2e2410; color:var(--warn); }
-.block { border-color:#6b2420; } .block b { background:#3a1513; color:var(--bad); }
-.v p { margin:0; font-size:14.5px; color:#c3ccd5; }
-pre { background:#0f1318; border:1px solid var(--line); border-radius:10px; padding:16px; overflow:auto; font-size:13px; line-height:1.6; }
-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-.tx a { color:var(--accent); word-break:break-all; }
-footer { margin-top:60px; color:var(--dim); font-size:13px; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+a { color:inherit; }
+.mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; }
+.wrap { max-width:1160px; margin:0 auto; padding:0 24px; }
+.grad { background:linear-gradient(92deg,#8fc1ff 0%,#6ee7b7 55%,#c4b5fd 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+nav { position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.4) blur(14px); -webkit-backdrop-filter:saturate(1.4) blur(14px); background:rgba(5,6,8,.72); border-bottom:1px solid var(--line); }
+nav .wrap { display:flex; align-items:center; height:60px; gap:28px; }
+.logo { display:flex; align-items:center; gap:10px; font-weight:600; font-size:16px; text-decoration:none; letter-spacing:-.2px; }
+.mark { width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,#6aa8ff,#3ecf6e); display:grid; place-items:center; }
+.mark svg { width:14px; height:14px; color:#07080a; }
+nav .links { display:flex; gap:24px; font-size:14px; color:var(--dim); }
+nav .links a { text-decoration:none; } nav .links a:hover { color:var(--text); }
+nav .right { margin-left:auto; }
+.btn { display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 18px; border-radius:999px; font-weight:500; font-size:14px; text-decoration:none; border:1px solid var(--line2); background:rgba(255,255,255,.04); transition:background .2s,border-color .2s; white-space:nowrap; }
+.btn:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.24); }
+.btn.p { background:#f2f4f7; color:#07080a; border-color:#f2f4f7; } .btn.p:hover { background:#fff; }
+.btn.sm { height:34px; padding:0 14px; font-size:13px; }
+
+.hero { position:relative; padding:96px 0 40px; text-align:center; isolation:isolate; }
+.aurora { position:absolute; inset:-200px 0 auto; height:1000px; pointer-events:none; z-index:-1; overflow:hidden; }
+.aurora i { position:absolute; width:720px; height:720px; border-radius:50%; filter:blur(120px); opacity:.45; animation:drift 18s ease-in-out infinite alternate; }
+.aurora i:nth-child(1) { left:8%; top:120px; background:#2f6bff; }
+.aurora i:nth-child(2) { right:6%; top:220px; background:#13c27a; opacity:.3; animation-delay:-6s; }
+.aurora i:nth-child(3) { left:38%; top:420px; background:#8b5cf6; opacity:.25; animation-delay:-12s; }
+@keyframes drift { to { transform:translate(60px,-40px) scale(1.1); } }
+.gridbg { position:absolute; inset:0; z-index:-1; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px); background-size:56px 56px; -webkit-mask-image:radial-gradient(700px 420px at 50% 20%,#000 10%,transparent 75%); mask-image:radial-gradient(700px 420px at 50% 20%,#000 10%,transparent 75%); }
+.pill { display:inline-flex; align-items:center; gap:10px; padding:6px 14px 6px 8px; border-radius:999px; border:1px solid var(--line2); background:rgba(255,255,255,.03); font-size:13px; color:#c9d0da; text-decoration:none; }
+.pill b { font-weight:500; padding:2px 8px; border-radius:999px; background:rgba(110,231,183,.12); color:#6ee7b7; font-size:12px; }
+h1 { font-size:clamp(40px,7vw,76px); line-height:1.02; letter-spacing:-.045em; font-weight:700; margin:26px auto 22px; max-width:900px; }
+.sub { font-size:clamp(17px,2vw,20px); color:var(--dim); max-width:660px; margin:0 auto; line-height:1.55; }
+.cta { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin:34px 0 64px; }
+
+.frame { position:relative; max-width:1080px; margin:0 auto; border-radius:14px; padding:1px; background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04)); box-shadow:0 40px 120px rgba(0,0,0,.6), 0 0 140px rgba(70,140,255,.18); }
+.frame .in { border-radius:13px; overflow:hidden; background:#0b0d10; }
+.frame .bar { display:flex; align-items:center; gap:8px; height:38px; padding:0 14px; background:#121519; border-bottom:1px solid var(--line); }
+.frame .bar i { width:11px; height:11px; border-radius:50%; background:#ff5f57; } .frame .bar i:nth-child(2) { background:#febc2e; } .frame .bar i:nth-child(3) { background:#28c840; }
+.frame .bar span { margin:0 auto; font-size:12px; color:var(--dim); padding:4px 14px; border-radius:7px; background:rgba(255,255,255,.05); transform:translateX(-22px); }
+video { width:100%; display:block; aspect-ratio:16/9; background:#000; }
+
+.stats { display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line); border-radius:16px; margin-top:96px; overflow:hidden; background:var(--panel); text-align:left; }
+.stat { padding:28px 28px 30px; border-left:1px solid var(--line); }
+.stat:first-child { border-left:0; }
+.stat .n { font-size:44px; font-weight:700; letter-spacing:-.04em; background:linear-gradient(180deg,#ff9b8f,#ff4d6d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.stat .w { font-size:13px; color:var(--dim); margin:2px 0 8px; }
+.stat p { margin:0; font-size:14.5px; color:#c3cad4; }
+
+section { padding:120px 0 0; }
+.eyebrow { font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#8fc1ff; }
+h2 { font-size:clamp(30px,4.4vw,48px); letter-spacing:-.035em; line-height:1.08; font-weight:700; margin:14px 0 14px; max-width:760px; }
+.lead { color:var(--dim); font-size:18px; max-width:640px; margin:0 0 44px; }
+
+.bento { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.tile { border:1px solid var(--line); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)); padding:24px; display:flex; flex-direction:column; transition:border-color .25s, transform .25s; }
+.tile:hover { border-color:var(--line2); transform:translateY(-2px); }
+.tile h3 { font-size:18px; letter-spacing:-.01em; margin:18px 0 8px; }
+.tile p { margin:0; color:#aab2bd; font-size:14.5px; }
+.tile .ex { margin-top:auto; padding-top:16px; color:var(--dim2); font-size:13px; }
+.vis { border:1px solid var(--line); border-radius:12px; background:#0a0c0f; padding:14px; font-family:"JetBrains Mono",monospace; font-size:12px; line-height:1.7; color:#9aa3ae; min-height:132px; overflow:hidden; }
+.vis .r { color:var(--bad); } .vis .g { color:var(--ok); } .vis .y { color:var(--warn); } .vis .b { color:#8fc1ff; }
+.tag { display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.06em; padding:1px 7px; border-radius:5px; font-family:Inter,sans-serif; }
+.tag.r { background:rgba(255,90,95,.14); color:var(--bad); } .tag.g { background:rgba(62,207,110,.14); color:var(--ok); } .tag.y { background:rgba(240,180,60,.14); color:var(--warn); }
+
+.flow { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.v { border-radius:16px; padding:24px; border:1px solid var(--line); background:var(--panel); position:relative; overflow:hidden; }
+.v::before { content:""; position:absolute; inset:0 0 auto; height:2px; }
+.v.allow::before { background:var(--ok); } .v.ask::before { background:var(--warn); } .v.block::before { background:var(--bad); }
+.v h3 { margin:14px 0 8px; font-size:17px; } .v p { margin:0; font-size:14.5px; color:#aab2bd; }
+.v .who { margin-top:16px; font-size:12.5px; color:var(--dim); font-family:"JetBrains Mono",monospace; }
+
+table { width:100%; border-collapse:collapse; font-size:15px; }
+.tbl { border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--panel); }
+th, td { text-align:left; padding:16px 22px; border-top:1px solid var(--line); }
+thead th { border-top:0; font-size:13px; font-weight:500; color:var(--dim); background:rgba(255,255,255,.02); }
+td:not(:first-child), th:not(:first-child) { width:170px; text-align:center; }
+.no { color:var(--bad); font-weight:600; } .yes { color:var(--ok); font-weight:600; }
+
+.txs { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.tx { display:block; text-decoration:none; border:1px solid var(--line); border-radius:16px; padding:22px 24px; background:var(--panel); transition:border-color .2s; }
+.tx:hover { border-color:var(--line2); }
+.tx .l { font-size:14px; color:var(--dim); margin-top:10px; }
+.tx .h { font-family:"JetBrains Mono",monospace; font-size:13px; color:#8fc1ff; word-break:break-all; margin-top:6px; }
+
+.term { border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#0a0c0f; }
+.term .bar { height:38px; display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:1px solid var(--line); background:#101317; }
+.term .bar i { width:11px; height:11px; border-radius:50%; background:#2a2f37; }
+pre { margin:0; padding:22px 24px; overflow:auto; font-size:13.5px; line-height:1.8; color:#d6dbe2; }
+pre .c { color:var(--dim2); } pre .p { color:#6ee7b7; user-select:none; }
+
+.final { text-align:center; padding:140px 0 120px; position:relative; isolation:isolate; }
+.final h2 { margin:0 auto 18px; }
+footer { border-top:1px solid var(--line); padding:28px 0 40px; color:var(--dim2); font-size:13px; }
+footer .wrap { display:flex; flex-wrap:wrap; gap:12px 24px; justify-content:space-between; }
+footer a { color:var(--dim); text-decoration:none; } footer a:hover { color:var(--text); }
+
+.reveal { opacity:0; transform:translateY(18px); filter:blur(6px); transition:opacity .8s ease, transform .8s ease, filter .8s ease; }
+.reveal.on { opacity:1; transform:none; filter:none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity:1; transform:none; filter:none; } .aurora i { animation:none; } }
+@media (max-width: 860px) {
+  nav .links { display:none; }
+  .stats, .bento, .flow, .txs { grid-template-columns:1fr; }
+  .stat { border-left:0; border-top:1px solid var(--line); } .stat:first-child { border-top:0; }
+  .hero { padding-top:64px; } section { padding-top:88px; }
+  td:not(:first-child), th:not(:first-child) { width:auto; }
+  th, td { padding:14px 12px; font-size:14px; }
+  .wrap { padding:0 16px; }
+  .frame .bar span { display:none; }
+}
 </style></head>
-<body><div class="wrap">
-<div class="logo"><i></i>Airlock</div>
-<h1>A browser for AI agents that spend money on NEAR</h1>
-<p class="sub">Airlock lets an agent drive any page. Payments outside the agent's key go to a window only you can click, and a dapp whose code changed does not load.</p>
-<div class="cta">
-  <a class="p" href="https://github.com/itsharshag/airlock">GitHub</a>
-  <a href="#try">Try it</a>
-  <a href="https://airlock-tipjar.itsharshag.com">Demo dapp</a>
-  <a href="https://airlock-news.itsharshag.com">Page with a hidden prompt</a>
-</div>
-<video src="demo.mp4" poster="poster.jpg" controls playsinline muted preload="metadata"></video>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg></span>Airlock</a>
+  <div class="links"><a href="#attacks">Attacks</a><a href="#how">How it works</a><a href="#why">Why a browser</a><a href="#try">Try it</a></div>
+  <div class="right"><a class="btn sm" href="https://github.com/itsharshag/airlock">GitHub</a></div>
+</div></nav>
 
-<h2>The attacks it stops</h2>
-<div class="grid">
-  <div class="card"><h3>A swapped dapp frontend</h3><p>Airlock hashes every file a pinned dapp serves before the page gets it. If a file changes, Airlock refuses it and blocks signing from that site. Chrome extensions never see a site's files, so they cannot do this.</p><div class="ex">Bybit lost $1.5B in February 2025 after attackers swapped the Safe{Wallet} JavaScript.</div></div>
-  <div class="card"><h3>An agent tricked by a page</h3><p>The agent controls the browser through an API that reaches the page and nothing else. Approvals open in a separate window, and on macOS they also need Touch ID. Airlock refuses to start with remote debugging on.</p><div class="ex">In May 2026, hidden text in a page drained $175k from an AI agent's wallet.</div></div>
-  <div class="card"><h3>A poisoned extension update</h3><p>Airlock has no extensions. The signing guard is part of the browser.</p><div class="ex">A bad Trust Wallet extension update took about $7M in December 2025.</div></div>
-</div>
+<header class="hero">
+  <div class="aurora"><i></i><i></i><i></i></div><div class="gridbg"></div>
+  <div class="wrap">
+    <a class="pill" href="https://nearhackathon.com"><b>New</b>Built at NEAR Hackathon 2026</a>
+    <h1>A browser for AI agents that spend money <span class="grad">on NEAR</span></h1>
+    <p class="sub">The agent drives any page. Payments outside its key open a window only you can click, and a dapp whose code changed never loads.</p>
+    <div class="cta"><a class="btn p" href="#demo">Watch the demo</a><a class="btn" href="https://github.com/itsharshag/airlock">View the code</a></div>
+    <div class="frame" id="demo"><div class="in">
+      <div class="bar"><i></i><i></i><i></i><span class="mono">airlock.itsharshag.com/demo</span></div>
+      <video src="demo.mp4" poster="poster.jpg" controls playsinline muted preload="metadata"></video>
+    </div></div>
+    <div class="stats reveal">
+      <div class="stat"><div class="n">$1.5B</div><div class="w">Bybit, February 2025</div><p>Attackers swapped the Safe{Wallet} JavaScript. Signers approved a transaction they never saw.</p></div>
+      <div class="stat"><div class="n">$175k</div><div class="w">An AI agent's wallet, May 2026</div><p>Hidden text in a web page told the agent to send the funds.</p></div>
+      <div class="stat"><div class="n">$7M</div><div class="w">Trust Wallet extension, December 2025</div><p>A poisoned store update took funds from about 2,500 wallets.</p></div>
+    </div>
+  </div>
+</header>
 
-<h2>What happens when a page asks to sign</h2>
-<div class="flow">
-  <div class="v allow"><b>ALLOW</b><p>The request fits the agent's NEAR function-call key, which can call one method on one contract and cannot move NEAR. The agent key signs it.</p></div>
-  <div class="v warn"><b>ASK YOU</b><p>The request moves funds, or the receiver is new, barely used, or changed its contract this week. Only the approval window can sign it.</p></div>
-  <div class="v block"><b>BLOCK</b><p>The receiver imitates a known account or is on the blocklist, the request adds a full access key or deletes the account, or the site's code failed its pin.</p></div>
-</div>
+<section id="attacks"><div class="wrap">
+  <div class="eyebrow reveal">The attacks it stops</div>
+  <h2 class="reveal">Every one of these hits at the moment someone signs.</h2>
+  <p class="lead reveal">Airlock checks each request inside the browser, before a key ever touches it.</p>
+  <div class="bento">
+    <div class="tile reveal">
+      <div class="vis"><span class="b">GET</span> /app.js<br>pinned&nbsp; sha256-q8Xr…f2A=<br>served&nbsp; <span class="r">sha256-Lm0c…9wQ=</span><br><br><span class="tag r">BLOCKED</span> Changed code refused</div>
+      <h3>A swapped dapp frontend</h3>
+      <p>Airlock hashes every file a pinned dapp serves before the page gets it. A changed file never runs, and the site loses signing.</p>
+      <div class="ex">This is how Bybit lost $1.5B.</div>
+    </div>
+    <div class="tile reveal">
+      <div class="vis"><span class="b">GET</span>&nbsp; /windows <span class="g">200</span> ["page"]<br><span class="b">POST</span> /approve <span class="r">404</span><br><span class="b">POST</span> /key&nbsp;&nbsp;&nbsp;&nbsp; <span class="g">200</span> "page"<br><br><span class="tag y">ASK YOU</span> Waiting for a human</div>
+      <h3>An agent tricked by a page</h3>
+      <p>The agent's API reaches the page and nothing else. Approvals open in a window it cannot see or click, with Touch ID on macOS.</p>
+      <div class="ex">Hidden text drained $175k from an agent in May 2026.</div>
+    </div>
+    <div class="tile reveal">
+      <div class="vis">near-0fficial.testnet<br><span class="y">imitates</span> near-official.testnet<br><span class="r">does not exist</span> on chain<br><br><span class="tag r">BLOCKED</span> Lookalike receiver</div>
+      <h3>A lookalike or brand new receiver</h3>
+      <p>Airlock reads the receiver from NEAR before signing. It blocks lookalikes and asks you about accounts created or changed this week.</p>
+      <div class="ex">Data from NEAR RPC and NearBlocks.</div>
+    </div>
+  </div>
+</div></section>
 
-<h2>Testnet transactions from the video</h2>
-<div class="tx" id="txs">
-  <p>The agent key signs the guestbook entry. <a href="https://testnet.nearblocks.io/txns/FE8mWrmjAufe2okyNtnuzUUbjKuq2YKC8rZpVaHZAwzL">FE8mWrmj…</a></p>
-  <p>You approve the 0.1 NEAR tip. <a href="https://testnet.nearblocks.io/txns/3pdd9Q3zdMVPMVpphHKyaQrtdCheGeM33Hm7sKwo5Jt3">3pdd9Q3z…</a></p>
-</div>
+<section id="how"><div class="wrap">
+  <div class="eyebrow reveal">How it works</div>
+  <h2 class="reveal">Each request gets one of three answers.</h2>
+  <p class="lead reveal">The page never holds a key. It calls <span class="mono">window.near</span>, and Airlock decides who signs.</p>
+  <div class="flow">
+    <div class="v allow reveal"><span class="tag g">ALLOW</span><h3>The agent key signs</h3><p>The request fits the agent's NEAR function-call key. That key calls one method on one contract and cannot move NEAR.</p><div class="who">signer: agent key</div></div>
+    <div class="v ask reveal"><span class="tag y">ASK YOU</span><h3>Only you can approve</h3><p>The request moves funds, or the receiver is new, barely used, or changed its contract this week.</p><div class="who">signer: your key, after you click</div></div>
+    <div class="v block reveal"><span class="tag r">BLOCK</span><h3>Nobody signs</h3><p>The receiver imitates a known account or is on the blocklist, the request adds a full access key, or the site's code failed its pin.</p><div class="who">signer: none</div></div>
+  </div>
+</div></section>
 
-<h2 id="try">Try it</h2>
-<pre><code>git clone https://github.com/itsharshag/airlock && cd airlock && npm install
-node scripts/make-account.js     # creates a testnet account from the faucet
-node scripts/add-agent-key.js    # adds the agent's function-call key on chain
-node scripts/make-payee.js
+<section id="why"><div class="wrap">
+  <div class="eyebrow reveal">Why a browser</div>
+  <h2 class="reveal">An extension cannot do this job.</h2>
+  <p class="lead reveal">Chrome gives extensions no access to response bodies, and an agent that controls the browser can click any button an extension draws.</p>
+  <div class="tbl reveal"><table>
+    <thead><tr><th></th><th>Wallet extension</th><th>Airlock</th></tr></thead>
+    <tbody>
+      <tr><td>Checks a site's code before it runs</td><td class="no">No</td><td class="yes">Yes</td></tr>
+      <tr><td>Keeps the agent away from Approve</td><td class="no">No</td><td class="yes">Yes</td></tr>
+      <tr><td>Immune to a poisoned extension update</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
 
-T=https://airlock-tipjar.itsharshag.com
-AIRLOCK_START_URL=$T AIRLOCK_PINS=$T npm start
-# In Airlock, sign the guestbook, tip 0.1 NEAR, and open https://airlock-news.itsharshag.com
-# Open $T/__attacker/swap?on=1 to swap app.js in your browser only</code></pre>
+<section id="proof"><div class="wrap">
+  <div class="eyebrow reveal">Proof</div>
+  <h2 class="reveal">Real testnet transactions from the video.</h2>
+  <p class="lead reveal">Open either one on NearBlocks.</p>
+  <div class="txs">
+    <a class="tx reveal" href="https://testnet.nearblocks.io/txns/FE8mWrmjAufe2okyNtnuzUUbjKuq2YKC8rZpVaHZAwzL"><span class="tag g">ALLOW</span><div class="l">The agent key signs a guestbook entry.</div><div class="h">FE8mWrmjAufe2okyNtnuzUUbjKuq2YKC8rZpVaHZAwzL</div></a>
+    <a class="tx reveal" href="https://testnet.nearblocks.io/txns/3pdd9Q3zdMVPMVpphHKyaQrtdCheGeM33Hm7sKwo5Jt3"><span class="tag y">ASK YOU</span><div class="l">You approve a 0.1 NEAR tip.</div><div class="h">3pdd9Q3zdMVPMVpphHKyaQrtdCheGeM33Hm7sKwo5Jt3</div></a>
+  </div>
+</div></section>
 
-<footer>Built at NEAR Hackathon in November 2026. MIT license.</footer>
-</div></body></html>
+<section id="try"><div class="wrap">
+  <div class="eyebrow reveal">Try it</div>
+  <h2 class="reveal">Run it against the hosted demo sites.</h2>
+  <p class="lead reveal">You need Node 20 and macOS or Linux. The scripts create a fresh testnet account for you.</p>
+  <div class="term reveal"><div class="bar"><i></i><i></i><i></i></div>
+<pre class="mono"><span class="p">$ </span>git clone https://github.com/itsharshag/airlock &amp;&amp; cd airlock &amp;&amp; npm install
+<span class="p">$ </span>node scripts/make-account.js    <span class="c"># testnet account from the faucet</span>
+<span class="p">$ </span>node scripts/add-agent-key.js   <span class="c"># the agent's scoped key, on chain</span>
+<span class="p">$ </span>node scripts/make-payee.js
+<span class="p">$ </span>T=https://airlock-tipjar.itsharshag.com
+<span class="p">$ </span>AIRLOCK_START_URL=$T AIRLOCK_PINS=$T npm start
+<span class="c"># Sign the guestbook, tip 0.1 NEAR, then open airlock-news.itsharshag.com</span>
+<span class="c"># Open $T/__attacker/swap?on=1 to swap app.js in your browser only</span></pre></div>
+</div></section>
+
+<div class="final"><div class="gridbg"></div><div class="wrap">
+  <h2 class="reveal">Let agents pay. <span class="grad">Keep the keys.</span></h2>
+  <div class="cta reveal" style="margin:30px 0 0"><a class="btn p" href="https://github.com/itsharshag/airlock">Get the code</a><a class="btn" href="https://airlock-tipjar.itsharshag.com">Open the demo dapp</a><a class="btn" href="https://airlock-news.itsharshag.com">Page with a hidden prompt</a></div>
+</div></div>
+
+<footer><div class="wrap"><span>Airlock. Built at NEAR Hackathon 2026. MIT license.</span><span><a href="https://github.com/itsharshag/airlock">GitHub</a> &nbsp; <a href="agent.log">Agent log</a></span></div></footer>
+
+<script>
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body></html>
